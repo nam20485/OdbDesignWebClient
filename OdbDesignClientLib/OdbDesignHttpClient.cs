@@ -1,10 +1,13 @@
 ﻿using System;
 using System.IO;
 using System.Net.Http;
+using System.Net.Http.Headers;
+using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using System.Xml.Linq;
+using Odb.Client.Lib.Model;
 
 namespace Odb.Client.Lib
 {
@@ -12,13 +15,25 @@ namespace Odb.Client.Lib
     {
         public bool UseLocalCopy { get; } = false;
 
-        private readonly HttpClient _httpClient;       
+        private readonly HttpClient _httpClient;
+        //private readonly IHttpClientFactory _httpClientFactory;
 
         public OdbDesignHttpClient(HttpClient httpClient)
         {
-            _httpClient = httpClient;            
-        }  
-        
+            _httpClient = httpClient;
+        }
+
+        //public OdbDesignHttpClient(IHttpClientFactory httpClientClientFactory)
+        //{
+        //    _httpClientFactory = httpClientClientFactory;
+        //}
+
+        public void AddAuthenticationData(string username, string password)
+        {
+            var authHeaderValue = Convert.ToBase64String(Encoding.ASCII.GetBytes($"{username}:{password}"));
+            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", authHeaderValue);
+        }
+
         public TResponseObject FetchObject<TResponseObject>(string endpoint) where TResponseObject : class
         {
             return FetchObjectAsync<TResponseObject>(endpoint).GetAwaiter().GetResult();
@@ -30,35 +45,38 @@ namespace Odb.Client.Lib
 
             Console.Write($"making request: '{endpoint}'... ");
 
-            var response = await _httpClient.GetAsync(endpoint);
-
-            Console.WriteLine($"complete ({response.StatusCode})");
-
-            if (response.IsSuccessStatusCode)
+            //using (var httpClient = _httpClientFactory.CreateClient())
             {
-                var t = typeof(TResponseObject);
-                var name = endpoint.Replace("/", "-");
-                var path = $"{name}.json";
+                var response = await _httpClient.GetAsync(endpoint);
 
-                Stream stream;
-                if (UseLocalCopy)
+                Console.WriteLine($"complete ({response.StatusCode})");
+
+                if (response.IsSuccessStatusCode)
                 {
-                    stream = new FileStream(path, FileMode.Open);
-                }
-                else
-                {
-                    Console.Write("writing response content to file... ");
-                    File.WriteAllText(path, await response.Content.ReadAsStringAsync());
-                    Console.WriteLine("complete");
+                    //var t = typeof(TResponseObject);
+                    var name = endpoint.Replace("/", "-");
+                    var path = $"{name}.json";
 
-                    Console.WriteLine("reading content from response... ");
-                    stream = await response.Content.ReadAsStreamAsync();
+                    Stream stream;
+                    if (UseLocalCopy)
+                    {
+                        stream = new FileStream(path, FileMode.Open);
+                    }
+                    else
+                    {
+                        Console.Write("writing response content to file... ");
+                        File.WriteAllText(path, await response.Content.ReadAsStringAsync());
+                        Console.WriteLine("complete");
+
+                        Console.WriteLine("reading content from response... ");
+                        stream = await response.Content.ReadAsStreamAsync();
+                        Console.WriteLine("complete");
+                    }
+
+                    Console.Write("deserializing response content... ");
+                    respObj = await JsonSerializer.DeserializeAsync<TResponseObject>(stream, LibJsonSerializerOptions.Instance);
                     Console.WriteLine("complete");
                 }
-
-                Console.Write("deserializing response content... ");
-                respObj = await JsonSerializer.DeserializeAsync<TResponseObject>(stream, LibJsonSerializerOptions.Instance);
-                Console.WriteLine("complete");
             }
 
             return respObj;
@@ -88,9 +106,15 @@ namespace Odb.Client.Lib
             return design;
         }
 
-        public Design FetchDesign(string name)
+        public Design FetchDesign(string name) => FetchDesignAsync(name).GetAwaiter().GetResult();
+
+        public async Task<FileArchiveListResponse> FetchFileArchiveListAsync()
         {
-            return FetchDesignAsync(name).GetAwaiter().GetResult();
+            var endpoint = "filemodels";
+            var fileArchiveListResponse = await FetchObjectAsync<FileArchiveListResponse>(endpoint);
+            return fileArchiveListResponse;
         }
+
+        public FileArchiveListResponse FetchFileArchiveList() => FetchFileArchiveListAsync().GetAwaiter().GetResult();
     }
 }

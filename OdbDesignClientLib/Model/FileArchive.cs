@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Odb.Client.Lib
+namespace Odb.Client.Lib.Model
 {
     public enum BoardSide
     {
@@ -13,20 +13,20 @@ namespace Odb.Client.Lib
     public enum LineShape
     {
         Square,
-		Round
+        Round
     };
 
     public enum Polarity
     {
         Positive,
-		Negative
+        Negative
     };
 
     public enum UnitType
     {
         None,
-		Metric,
-		Imperial
+        Metric,
+        Imperial
     };
 
     public class Design
@@ -39,9 +39,9 @@ namespace Odb.Client.Lib
         public StepDirectory.StringDictionary stepsByName { get; set; }
         public MiscInfoFile miscInfoFile { get; set; }
         public Matrixfile matrixFile { get; set; }
-        public StandardFontsFile standardFontsFile { get; set; }        
+        public StandardFontsFile standardFontsFile { get; set; }
         public SymbolsDirectory.StringDictionary symbolsDirectoriesByName { get; set; }
-    }    
+    }
 
     public class StepDirectory
     {
@@ -52,7 +52,7 @@ namespace Odb.Client.Lib
         public EdaDataFile edadatafile { get; set; }
         public AttrListFile attrlistfile { get; set; }
 
-        public class StringDictionary : Dictionary<string, StepDirectory>   {}
+        public class StringDictionary : Dictionary<string, StepDirectory> { }
     }
 
     public class LayerDirectory
@@ -64,7 +64,7 @@ namespace Odb.Client.Lib
         public FeaturesFile featureFile { get; set; }
 
         public class StringDictionary : Dictionary<string, LayerDirectory> { }
-    }     
+    }
 
     public class AttrListFile
     {
@@ -72,7 +72,7 @@ namespace Odb.Client.Lib
         public string path { get; set; }
         public string units { get; set; }
         public Dictionary<string, string> attributesByName { get; set; }
-    }          
+    }
 
     public class FeaturesFile
     {
@@ -87,11 +87,11 @@ namespace Odb.Client.Lib
         public enum Type
         {
             Arc,
-				Pad,
-				Surface,
-				Barcode,
-				Text,
-				Line
+            Pad,
+            Surface,
+            Barcode,
+            Text,
+            Line
         };
 
         public Type type { get; set; }
@@ -126,7 +126,7 @@ namespace Odb.Client.Lib
         public enum Type
         {
             Island,
-			Hole
+            Hole
         };
 
         public Type type { get; set; }
@@ -148,7 +148,7 @@ namespace Odb.Client.Lib
         public float xCenter { get; set; }
         public float yCenter { get; set; }
         public bool isClockwise { get; set; }
-    }    
+    }
 
     public class ComponentsFile
     {
@@ -195,15 +195,15 @@ namespace Odb.Client.Lib
         public uint netNumber { get; set; }
         public uint subnetNumber { get; set; }
         public string name { get; set; }
-    }        
+    }
 
     public class NetlistFile
     {
         public enum Staggered
         {
             Yes,
-			No,
-			Unknown
+            No,
+            Unknown
         };
 
         public string path { get; set; }
@@ -217,7 +217,7 @@ namespace Odb.Client.Lib
 
         public class StringDictionary : Dictionary<string, NetlistFile> { }
 
-    }     
+    }
 
     public class NetName
     {
@@ -260,7 +260,7 @@ namespace Odb.Client.Lib
         public NetRecord.StringDictionary netRecordsByName { get; set; }
         public PackageRecord[] packageRecords { get; set; }
         public PackageRecord.StringDictionary packageRecordsByName { get; set; }
-    }    
+    }
 
     public class NetRecord
     {
@@ -307,15 +307,15 @@ namespace Odb.Client.Lib
         public enum Type
         {
             Copper,
-			Laminate,
-			Hole
+            Laminate,
+            Hole
         };
 
         public Type type { get; set; }
         public uint layerNumber { get; set; }
         public uint featureNumber { get; set; }
     }
-    
+
     public class PackageRecord
     {
         public string name { get; set; }
@@ -390,7 +390,7 @@ namespace Odb.Client.Lib
         public float halfSide { get; set; }
         public float radius { get; set; }
         public ContourPolygon[] contourPolygons { get; set; }
-    }  
+    }
 
     public class MiscInfoFile
     {

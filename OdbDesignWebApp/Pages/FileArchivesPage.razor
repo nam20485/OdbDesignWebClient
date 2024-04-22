@@ -1,0 +1,29 @@
+﻿@page "/filearchives"
+
+@namespace Odb.Client.Lib.Services
+@inject IOdbDesignClientService OdbDesignClientService
+@* @inject OdbDesignHttpClient OdbDesignHttpClient *@
+
+<h3>File Archives</h3>
+
+@foreach (var fileArchiveName in FileArchiveNames)
+{
+    <p>@fileArchiveName</p>
+}
+
+
+@code {
+    private string[] FileArchiveNames { get; set; } = Array.Empty<string>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        OdbDesignClientService.AddAuthenticationData("odb++", "design!");
+
+        var response = await OdbDesignClientService.GetFileArchiveListAsync();
+        FileArchiveNames = response.FileArchives;
+
+
+        //return base.OnInitializedAsync();
+    }
+
+}
