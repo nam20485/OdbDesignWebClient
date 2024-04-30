@@ -34,10 +34,5 @@ namespace Odb.Client.Lib.Services
         {
             return await _odbDesignHttpClient.FetchFileArchiveListAsync();
         }
-
-        public void AddAuthenticationData(string username, string password)
-        {
-            _odbDesignHttpClient.AddAuthenticationData(username, password);
-        }
     }
 }

@@ -9,7 +9,6 @@ namespace Odb.Client.Lib.Services
     public interface IOdbDesignClientService
     {
         Task<FileArchive> GetFileArchiveAsync(string name);
-        Task<FileArchiveListResponse> GetFileArchiveListAsync();
-        void AddAuthenticationData(string username, string password);
+        Task<FileArchiveListResponse> GetFileArchiveListAsync();        
     }
 }
