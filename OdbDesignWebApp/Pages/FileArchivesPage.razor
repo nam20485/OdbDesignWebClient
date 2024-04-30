@@ -19,7 +19,7 @@
     protected override async Task OnInitializedAsync()
     {
         //OdbDesignClientService.AddAuthenticationData("odb++", "design!");
-        AuthService.Login("odb++", "design!");
+        await AuthService.LoginAsync("odb++", "design!");
 
         var response = await OdbDesignClientService.GetFileArchiveListAsync();
         FileArchiveNames = response.FileArchives;

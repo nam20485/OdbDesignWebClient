@@ -48,7 +48,7 @@ namespace Odb.Client.Lib
 
             Console.Write($"making request: '{endpoint}'... ");
 
-            _httpClient.DefaultRequestHeaders.Authorization = _authService.GetAuthenticationHeaderValue();
+            _httpClient.DefaultRequestHeaders.Authorization = await _authService.GetAuthenticationHeaderValueAsync();
 
             //using (var httpClient = _httpClientFactory.CreateClient())
             try

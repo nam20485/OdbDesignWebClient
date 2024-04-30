@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace Odb.Client.Lib.Services
 {
@@ -10,7 +11,6 @@ namespace Odb.Client.Lib.Services
     {            
         public string Username { get; }
 
-        private AuthenticationHeaderValue _authenticationHeaderValue;
         private readonly ILocalStorageService _localStorageService;
 
         public AuthenticationService(ILocalStorageService localStorageService)
@@ -18,25 +18,34 @@ namespace Odb.Client.Lib.Services
             _localStorageService = localStorageService;
         }
 
-        public AuthenticationHeaderValue GetAuthenticationHeaderValue()
+        public async Task<AuthenticationHeaderValue> GetAuthenticationHeaderValueAsync()
         {
-            return _authenticationHeaderValue;
+            var username = await _localStorageService.GetUsernameAsync();
+            var password = await _localStorageService.GetPasswordAsync();
+
+            if (!string.IsNullOrWhiteSpace(username) && !string.IsNullOrWhiteSpace(password))
+            {
+                var authHeaderValue = Convert.ToBase64String(Encoding.ASCII.GetBytes($"{username}:{password}"));
+                return new AuthenticationHeaderValue("Basic", authHeaderValue);
+            }
+
+            return null;
         }
 
-        public bool IsLoggedIn()
+        public async Task<bool> IsLoggedInAsync()
         {
-            return _authenticationHeaderValue != null;
+            return await GetAuthenticationHeaderValueAsync() != null;
         }
 
-        public void Login(string username, string pass)
+        public async Task LoginAsync(string username, string pass)
         {
-            var authHeaderValue = Convert.ToBase64String(Encoding.ASCII.GetBytes($"{username}:{pass}"));
-            _authenticationHeaderValue = new AuthenticationHeaderValue("Basic", authHeaderValue);
+            await _localStorageService.SetUsernameAsync(username);
+            await _localStorageService.SetPasswordAsync(pass);
         }
 
-        public void Logout()
+        public async Task LogoutAsync()
         {
-            _authenticationHeaderValue = null;
+            await _localStorageService.RemoveAuthDataAsync();
         }
     }
 }

@@ -47,21 +47,21 @@
     private bool loading;
     private string error;
 
-    protected override void OnInitialized()
+    protected async override void OnInitialized()
     {
         // redirect to home if already logged in
-        if (! AuthenticationService.IsLoggedIn())
+        if (! await AuthenticationService.IsLoggedInAsync())
         {
             NavigationManager.NavigateTo("");
         }
     }
 
-    private void HandleValidSubmit()
+    private async void HandleValidSubmit()
     {
         loading = true;
         try
         {
-            AuthenticationService.Login(model.Username, model.Password);
+            await AuthenticationService.LoginAsync(model.Username, model.Password);
             var queryParams = HttpUtility.ParseQueryString(NavigationManager.ToAbsoluteUri(NavigationManager.Uri).Query);
             var returnUrl = queryParams[RETURN_URL_QUERY_NAME] ?? "";
             NavigationManager.NavigateTo(returnUrl);
