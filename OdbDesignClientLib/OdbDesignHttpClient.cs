@@ -8,6 +8,7 @@ using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 using Odb.Client.Lib.Model;
+using Odb.Client.Lib.Services;
 
 namespace Odb.Client.Lib
 {
@@ -17,10 +18,12 @@ namespace Odb.Client.Lib
 
         private readonly HttpClient _httpClient;
         //private readonly IHttpClientFactory _httpClientFactory;
+        private readonly IAuthenticationService _authService;
 
-        public OdbDesignHttpClient(HttpClient httpClient)
+        public OdbDesignHttpClient(HttpClient httpClient, IAuthenticationService authService)
         {
             _httpClient = httpClient;
+            _authService = authService;
         }
 
         //public OdbDesignHttpClient(IHttpClientFactory httpClientClientFactory)
@@ -30,8 +33,8 @@ namespace Odb.Client.Lib
 
         public void AddAuthenticationData(string username, string password)
         {
-            var authHeaderValue = Convert.ToBase64String(Encoding.ASCII.GetBytes($"{username}:{password}"));
-            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", authHeaderValue);
+            //var authHeaderValue = Convert.ToBase64String(Encoding.ASCII.GetBytes($"{username}:{password}"));
+            //_httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", authHeaderValue);
         }
 
         public TResponseObject FetchObject<TResponseObject>(string endpoint) where TResponseObject : class
@@ -45,7 +48,10 @@ namespace Odb.Client.Lib
 
             Console.Write($"making request: '{endpoint}'... ");
 
+            _httpClient.DefaultRequestHeaders.Authorization = _authService.GetAuthenticationHeaderValue();
+
             //using (var httpClient = _httpClientFactory.CreateClient())
+            try
             {
                 var response = await _httpClient.GetAsync(endpoint);
 
@@ -77,6 +83,10 @@ namespace Odb.Client.Lib
                     respObj = await JsonSerializer.DeserializeAsync<TResponseObject>(stream, LibJsonSerializerOptions.Instance);
                     Console.WriteLine("complete");
                 }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
             }
 
             return respObj;
