@@ -1,8 +1,9 @@
 ﻿@page "/filearchives"
 
-@namespace Odb.Client.Lib.Services
+@* @namespace Odb.Client.Web *@
+@using Odb.Client.Lib.Services
 @inject IOdbDesignClientService OdbDesignClientService
-@* @inject OdbDesignHttpClient OdbDesignHttpClient *@
+@inject IAuthenticationService AuthService
 
 <h3>File Archives</h3>
 
@@ -17,7 +18,8 @@
 
     protected override async Task OnInitializedAsync()
     {
-        OdbDesignClientService.AddAuthenticationData("odb++", "design!");
+        //OdbDesignClientService.AddAuthenticationData("odb++", "design!");
+        AuthService.Login("odb++", "design!");
 
         var response = await OdbDesignClientService.GetFileArchiveListAsync();
         FileArchiveNames = response.FileArchives;
