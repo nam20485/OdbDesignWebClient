@@ -24,14 +24,15 @@ namespace OdbDesignWebApp
             }
             else
             {
-                throw new Exception("Invalid API URL (ensure \"ApiUrl\" is set in appsettings");
+                throw new Exception("Invalid API URL (is \"ApiUrl\" set in appsettings?");
             }
 
             builder.Services.AddHttpClient<OdbDesignHttpClient>(client => client.BaseAddress = new Uri(_apiUrl));
-            builder.Services.AddSingleton<IOdbDesignClientService, OdbDesignClientService>();
 
-            // JS Interop
-            builder.Services.AddSingleton(sp => (IJSInProcessRuntime)sp.GetRequiredService<IJSRuntime>());
+            builder.Services.AddSingleton<ILocalStorageService, LocalStorageService>();   
+            builder.Services.AddSingleton<IAuthenticationService, AuthenticationService>();                     
+            builder.Services.AddSingleton<IOdbDesignClientService, OdbDesignClientService>();
+            builder.Services.AddSingleton(sp => sp.GetRequiredService<IJSRuntime>() as IJSInProcessRuntime);  // JS Interop            
 
             await builder.Build().RunAsync();
         }
