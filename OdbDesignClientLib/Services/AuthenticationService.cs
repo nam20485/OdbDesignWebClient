@@ -20,8 +20,8 @@ namespace Odb.Client.Lib.Services
 
         public async Task<AuthenticationHeaderValue> GetAuthenticationHeaderValueAsync()
         {
-            var username = await _localStorageService.GetUsernameAsync();
-            var password = await _localStorageService.GetPasswordAsync();
+            var username = await GetUsernameAsync();
+            var password = await GetPasswordAsync();
 
             if (!string.IsNullOrWhiteSpace(username) && !string.IsNullOrWhiteSpace(password))
             {
@@ -46,6 +46,16 @@ namespace Odb.Client.Lib.Services
         public async Task LogoutAsync()
         {
             await _localStorageService.RemoveAuthDataAsync();
+        }
+
+        public async Task<string> GetUsernameAsync()
+        {
+            return await _localStorageService.GetUsernameAsync();
+        }
+
+        public async Task<string> GetPasswordAsync()
+        {
+            return await _localStorageService.GetPasswordAsync();
         }
     }
 }

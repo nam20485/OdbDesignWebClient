@@ -12,5 +12,8 @@ namespace Odb.Client.Lib.Services
         Task LoginAsync(string username, string pass);
         Task LogoutAsync();
         Task<AuthenticationHeaderValue> GetAuthenticationHeaderValueAsync();
+
+        Task<string> GetUsernameAsync();
+        Task<string> GetPasswordAsync();
     }
 }
