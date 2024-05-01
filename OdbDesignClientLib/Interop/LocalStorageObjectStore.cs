@@ -11,7 +11,7 @@ namespace Odb.Client.Lib.Interop
     {
         private readonly ILocalStorageProvider _localStorageProvider;
 
-        private JsonSerializerOptions _jsonSerializerOptions = new JsonSerializerOptions
+        private readonly JsonSerializerOptions _jsonSerializerOptions = new JsonSerializerOptions
         {
             PropertyNameCaseInsensitive = false,
             //NumberHandling
@@ -20,6 +20,7 @@ namespace Odb.Client.Lib.Interop
             //PreferredObjectCreationHandling = JsonObjectCreationHandlingAttribute
             //UnknownTypeHandling = JsonUnknownTypeHandling.
             //UnmappedMemberHandling = JsonUnmappedMemberHandling.
+            IncludeFields = true,
         };
 
         public LocalStorageObjectStore(ILocalStorageProvider localStorageProvider)
