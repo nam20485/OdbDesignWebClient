@@ -4,19 +4,20 @@ using System.Text;
 using System.Threading.Tasks;
 
 using Microsoft.JSInterop;
+using Odb.Client.Lib.Interop;
 
 namespace Odb.Client.Lib.Services
 {
     public class LocalStorageService : ILocalStorageService
     {
-        private const string PasswordKey = "password";
-        private const string UsernameKey = "username";
+        private const string PasswordKey = "odbdwc_password";
+        private const string UsernameKey = "odbdwc_username";
         
-        private readonly ILocalStorage _localStorage;
+        private readonly ILocalStorageProvider _localStorage;
 
-        public LocalStorageService(IJSRuntime jsRuntime)
+        public LocalStorageService(ILocalStorageProvider localStorage)
         {
-           _localStorage = new JsLocalStorageProvider(jsRuntime);
+            _localStorage = localStorage;
         }
 
         public async Task<string> GetPasswordAsync()
