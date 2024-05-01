@@ -2,9 +2,8 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
+using Utils.Interop;
 
-using Microsoft.JSInterop;
-using Odb.Client.Lib.Interop;
 
 namespace Odb.Client.Lib.Services
 {

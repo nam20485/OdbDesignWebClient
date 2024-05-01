@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 using Microsoft.JSInterop;
 
-namespace Odb.Client.Lib.Interop
+namespace Utils.Interop
 {
     public class JsInteropProvider : IJsInteropProvider
     {
@@ -31,8 +31,8 @@ namespace Odb.Client.Lib.Interop
         public async ValueTask<TReturn> InvokeAsync<TReturn>(string name, params object[] @params)
         {
             return await _jsInProcessRuntime.InvokeAsync<TReturn>(name, @params);
-        } 
-        
+        }
+
         public async ValueTask InvokeVoidAsync(string name, params object[] @params)
         {
             await _jsInProcessRuntime.InvokeVoidAsync(name, @params);

@@ -7,6 +7,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OdbDesignWebApp", "OdbDesig
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OdbDesignClientLib", "OdbDesignClientLib\OdbDesignClientLib.csproj", "{43BEC8A3-D6DC-4CBB-ACC2-44805693CF18}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Utils", "Utils\Utils.csproj", "{D43F9C49-4BFA-4181-B40D-28EBB1880DC9}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{43BEC8A3-D6DC-4CBB-ACC2-44805693CF18}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{43BEC8A3-D6DC-4CBB-ACC2-44805693CF18}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{43BEC8A3-D6DC-4CBB-ACC2-44805693CF18}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D43F9C49-4BFA-4181-B40D-28EBB1880DC9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D43F9C49-4BFA-4181-B40D-28EBB1880DC9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D43F9C49-4BFA-4181-B40D-28EBB1880DC9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D43F9C49-4BFA-4181-B40D-28EBB1880DC9}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

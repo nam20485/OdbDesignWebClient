@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Web;
 
-namespace Odb.Client.Lib.Extensions
+namespace Utils.Extensions
 {
     public static class UriExtensions
     {

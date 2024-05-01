@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 using Microsoft.JSInterop;
 
-namespace Odb.Client.Lib.Interop
+namespace Utils.Interop
 {
     public class JsLocalStorageProvider : ILocalStorageProvider
     {
@@ -81,6 +81,6 @@ namespace Odb.Client.Lib.Interop
         public ValueTask SetItemAsync(string key, string value)
         {
             return _jsInteropProvider.InvokeVoidAsync(LOCALSTORAGE_SETITEM_METHOD, key, value);
-        }       
+        }
     }
 }

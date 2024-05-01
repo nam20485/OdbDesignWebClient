@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Odb.Client.Lib.Interop
+namespace Utils.Interop
 {
     public interface IJsInteropProvider
     {

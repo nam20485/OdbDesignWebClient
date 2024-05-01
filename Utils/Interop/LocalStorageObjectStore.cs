@@ -5,7 +5,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
-namespace Odb.Client.Lib.Interop
+namespace Utils.Interop
 {
     public class LocalStorageObjectStore : ILocalStorageObjectStore
     {
@@ -14,13 +14,11 @@ namespace Odb.Client.Lib.Interop
         private readonly JsonSerializerOptions _jsonSerializerOptions = new JsonSerializerOptions
         {
             PropertyNameCaseInsensitive = false,
-            //NumberHandling
-            ReferenceHandler = ReferenceHandler.Preserve,
+            //NumberHandling            
             Converters = { new JsonStringEnumConverter(JsonNamingPolicy.CamelCase) },
             //PreferredObjectCreationHandling = JsonObjectCreationHandlingAttribute
             //UnknownTypeHandling = JsonUnknownTypeHandling.
-            //UnmappedMemberHandling = JsonUnmappedMemberHandling.
-            IncludeFields = true,
+            //UnmappedMemberHandling = JsonUnmappedMemberHandling.            
         };
 
         public LocalStorageObjectStore(ILocalStorageProvider localStorageProvider)

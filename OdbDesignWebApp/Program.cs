@@ -3,8 +3,9 @@ using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using Microsoft.JSInterop;
 
 using Odb.Client.Lib;
-using Odb.Client.Lib.Interop;
 using Odb.Client.Lib.Services;
+
+using Utils.Interop;
 
 namespace OdbDesignWebApp
 {
@@ -29,9 +30,7 @@ namespace OdbDesignWebApp
             }
 
             builder.Services.AddHttpClient<OdbDesignHttpClient>(client => client.BaseAddress = new Uri(_apiUrl));
-
             builder.Services.AddSingleton(sp => sp.GetRequiredService<IJSRuntime>() as IJSInProcessRuntime);  // JS Interop
-
             builder.Services.AddSingleton<IJsInteropProvider, JsInteropProvider>();
             builder.Services.AddSingleton<ILocalStorageProvider, JsLocalStorageProvider>();
             builder.Services.AddSingleton<ILocalStorageService, LocalStorageService>();   
