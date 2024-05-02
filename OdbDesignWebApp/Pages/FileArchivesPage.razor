@@ -1,11 +1,17 @@
 ﻿@page "/filearchives"
 
 @* @namespace Odb.Client.Web *@
+@using Odb.Client.Lib
 @using Odb.Client.Lib.Services
 @inject IOdbDesignClientService OdbDesignClientService
 @inject IAuthenticationService AuthService
 
 <h3>File Archives</h3>
+
+<div>
+    <InputFile OnChange="@OnInputFileChanged" class="btn-primary" multiple />
+    <button disabled="@(SelectedFiles == null || SelectedFiles.Count == 0)" id="ifpicker" class="btn btn-primary" @onclick="UploadDesignFiles">Upload</button>
+</div>
 
 @foreach (var fileArchiveName in FileArchiveNames)
 {
@@ -14,15 +20,26 @@
 
 
 @code {
+    
     private string[] FileArchiveNames { get; set; } = Array.Empty<string>();
+
+    private IReadOnlyList<IBrowserFile> SelectedFiles { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
-        //OdbDesignClientService.AddAuthenticationData("odb++", "design!");
-        await AuthService.LoginAsync("odb++", "design!");
-
         var response = await OdbDesignClientService.GetFileArchiveListAsync();
         FileArchiveNames = response.FileArchives;
+    }
+
+    private async Task UploadDesignFiles()
+    {
+        var response = await OdbDesignClientService.UploadDesignFilesAsync(SelectedFiles);       
+    }
+
+    public void OnInputFileChanged(InputFileChangeEventArgs args)
+    {
+        SelectedFiles = args.GetMultipleFiles(10);
+        StateHasChanged();
     }
 
 }
