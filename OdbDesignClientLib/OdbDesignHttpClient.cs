@@ -134,16 +134,16 @@ namespace Odb.Client.Lib
 
         public FileArchiveListResponse FetchFileArchiveList() => FetchFileArchiveListAsync().GetAwaiter().GetResult();       
 
-        public async Task<FileUploadResponse> UploadDesignFileAsync(DesignFileUploadInfo uploadFileInfo)
+        public async Task<FileArchiveListResponse> UploadDesignFileAsync(DesignFileUploadInfo uploadFileInfo)
         {
             using var content = new ByteArrayContent(uploadFileInfo.Bytes);
             content.Headers.ContentType = MediaTypeHeaderValue.Parse(uploadFileInfo.ContentType);            
 
             var endpoint = $"{FILES_UPLOAD_ENDPOINT}/{uploadFileInfo.Filename}";
-            return await PostContentAsync<FileUploadResponse>(content, endpoint);
+            return await PostContentAsync<FileArchiveListResponse>(content, endpoint);
         }
 
-        public async Task<FileUploadResponse> UploadDesignFilesAsync(IEnumerable<DesignFileUploadInfo> uploadFileInfos)
+        public async Task<FileArchiveListResponse> UploadDesignFilesAsync(IEnumerable<DesignFileUploadInfo> uploadFileInfos)
         {
             using var content = new MultipartFormDataContent(MULTIPART_FORM_BOUNDARY);
             foreach (var fileInfo in uploadFileInfos)
@@ -153,10 +153,10 @@ namespace Odb.Client.Lib
                 content.Add(fileContent, MULTIPART_FORM_PART_NAME, fileInfo.Filename);
             }
 
-            return await PostContentAsync<FileUploadResponse>(content, FILES_UPLOAD_ENDPOINT);          
+            return await PostContentAsync<FileArchiveListResponse>(content, FILES_UPLOAD_ENDPOINT);          
         }        
 
-        public async Task<FileUploadResponse> UploadDesignFilesAsync(IEnumerable<IBrowserFile> browserFiles)
+        public async Task<FileArchiveListResponse> UploadDesignFilesAsync(IEnumerable<IBrowserFile> browserFiles)
         {
             using var content = new MultipartFormDataContent(MULTIPART_FORM_BOUNDARY);
             foreach (var browserFile in browserFiles)
@@ -166,7 +166,7 @@ namespace Odb.Client.Lib
                 content.Add(fileContent, MULTIPART_FORM_PART_NAME, browserFile.Name);
             }
 
-            return await PostContentAsync<FileUploadResponse>(content, FILES_UPLOAD_ENDPOINT);
+            return await PostContentAsync<FileArchiveListResponse>(content, FILES_UPLOAD_ENDPOINT);
         }
 
         private async Task<TReturn> PostContentAsync<TReturn>(HttpContent content, string endpoint)
@@ -175,7 +175,8 @@ namespace Odb.Client.Lib
             if (response.IsSuccessStatusCode)
             {
                 using var stream = await response.Content.ReadAsStreamAsync();
-                return await JsonSerializer.DeserializeAsync<TReturn>(stream, LibJsonSerializerOptions.Instance);
+                var respObj = await JsonSerializer.DeserializeAsync<TReturn>(stream, LibJsonSerializerOptions.Instance);
+                return respObj;
             }
 
             return default;
