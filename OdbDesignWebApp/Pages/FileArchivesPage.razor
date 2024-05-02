@@ -2,7 +2,9 @@
 
 @* @namespace Odb.Client.Web *@
 @using Odb.Client.Lib
+@using Odb.Client.Lib.Model
 @using Odb.Client.Lib.Services
+@using Radzen
 @inject IOdbDesignClientService OdbDesignClientService
 @inject IAuthenticationService AuthService
 
@@ -13,27 +15,41 @@
     <button disabled="@(SelectedFiles == null || SelectedFiles.Count == 0)" id="ifpicker" class="btn btn-primary" @onclick="UploadDesignFiles">Upload</button>
 </div>
 
-@foreach (var fileArchiveName in FileArchiveNames)
-{
-    <p>@fileArchiveName</p>
-}
+<RadzenDataGrid style="height: 400px" @ref="grid" IsLoading=@isLoading AllowVirtualization="true" Count="@count" Data="@fileLoadedInfos" LoadData="@LoadData" AllowSorting="true" AllowFiltering="true" AllowPaging="false" ColumnWidth="200px">
+     <Columns>
+        <RadzenDataGridColumn Property="Name" Filterable="false" Sortable="true" Title="Name" Frozen="true" Width="80px" TextAlign="TextAlign.Left"/>
+        <RadzenDataGridColumn Property="Loaded" Title="Loaded (Server)" Frozen="true" Sortable="false" Filterable="false" Width="80px" TextAlign="TextAlign.Center" />
+
+        @*            
+            <Template Context="data">
+                <RadzenImage Path="@data.Photo" class="rz-gravatar" AlternateText="@(data.FirstName + " " + data.LastName)" />
+            </Template>
+        *@
+        <RadzenDataGridColumn Title="Open" Sortable="false" TextAlign="TextAlign.Center" Width="100px">
+            <Template Context="fileLoadedInfo">
+                <RadzenButton Text="Open" Icon="launch" ButtonStyle="ButtonStyle.Secondary" Click="@((args) => OnOpenDesignClick(fileLoadedInfo))" />
+            </Template>
+        </RadzenDataGridColumn>
+    </Columns>
+</RadzenDataGrid>
 
 
 @code {
-    
-    private string[] FileArchiveNames { get; set; } = Array.Empty<string>();
+
+    RadzenDataGrid<FileArchiveListResponse.FileLoadedInfo> grid;
+    int count;
+    IEnumerable<FileArchiveListResponse.FileLoadedInfo> fileLoadedInfos;
+    bool isLoading = false;
 
     private IReadOnlyList<IBrowserFile> SelectedFiles { get; set; }
 
-    protected override async Task OnInitializedAsync()
-    {
-        var response = await OdbDesignClientService.GetFileArchiveListAsync();
-        FileArchiveNames = response.FileArchives;
-    }
-
     private async Task UploadDesignFiles()
     {
-        var response = await OdbDesignClientService.UploadDesignFilesAsync(SelectedFiles);       
+        var response = await OdbDesignClientService.UploadDesignFilesAsync(SelectedFiles);
+        isLoading = true;
+        UpdateFileLoadedInfos(response.FileArchives);
+        isLoading = false;
+        StateHasChanged();
     }
 
     public void OnInputFileChanged(InputFileChangeEventArgs args)
@@ -42,4 +58,22 @@
         StateHasChanged();
     }
 
+    private void UpdateFileLoadedInfos(FileArchiveListResponse.FileLoadedInfo[] infos)
+    {        
+        fileLoadedInfos = infos;
+        count = infos.Length;       
+    }
+
+    private async Task OnOpenDesignClick(FileArchiveListResponse.FileLoadedInfo info)
+    {
+        
+    }
+
+    private async Task LoadData(LoadDataArgs args)
+    {
+        isLoading = true;
+        var response = await OdbDesignClientService.GetFileArchiveListAsync();
+        UpdateFileLoadedInfos(response.FileArchives);
+        isLoading = false;
+    }
 }
