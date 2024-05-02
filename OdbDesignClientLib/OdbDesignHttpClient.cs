@@ -132,18 +132,12 @@ namespace Odb.Client.Lib
             return fileArchiveListResponse;
         }
 
-        public FileArchiveListResponse FetchFileArchiveList() => FetchFileArchiveListAsync().GetAwaiter().GetResult();
-
-        public struct DesignFileUploadInfo
-        {
-            public string Filename;
-            public byte[] Bytes;
-        }      
+        public FileArchiveListResponse FetchFileArchiveList() => FetchFileArchiveListAsync().GetAwaiter().GetResult();       
 
         public async Task<FileUploadResponse> UploadDesignFileAsync(DesignFileUploadInfo uploadFileInfo)
         {
             using var content = new ByteArrayContent(uploadFileInfo.Bytes);
-            content.Headers.ContentType = MediaTypeHeaderValue.Parse(CONTENT_TYPE_APPLICATION_OCTET_STREAM);            
+            content.Headers.ContentType = MediaTypeHeaderValue.Parse(uploadFileInfo.ContentType);            
 
             var endpoint = $"{FILES_UPLOAD_ENDPOINT}/{uploadFileInfo.Filename}";
             return await PostContentAsync<FileUploadResponse>(content, endpoint);
@@ -155,7 +149,7 @@ namespace Odb.Client.Lib
             foreach (var fileInfo in uploadFileInfos)
             {
                 var fileContent = new ByteArrayContent(fileInfo.Bytes);
-                fileContent.Headers.ContentType = MediaTypeHeaderValue.Parse(CONTENT_TYPE_APPLICATION_OCTET_STREAM);
+                fileContent.Headers.ContentType = MediaTypeHeaderValue.Parse(fileInfo.ContentType);
                 content.Add(fileContent, MULTIPART_FORM_PART_NAME, fileInfo.Filename);
             }
 
@@ -168,7 +162,7 @@ namespace Odb.Client.Lib
             foreach (var browserFile in browserFiles)
             {
                 var fileContent = new StreamContent(browserFile.OpenReadStream(OPEN_READSTREAM_MAX_FILE_SIZE));
-                fileContent.Headers.ContentType = MediaTypeHeaderValue.Parse(CONTENT_TYPE_APPLICATION_OCTET_STREAM);
+                fileContent.Headers.ContentType = MediaTypeHeaderValue.Parse(browserFile.ContentType);
                 content.Add(fileContent, MULTIPART_FORM_PART_NAME, browserFile.Name);
             }
 

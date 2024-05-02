@@ -7,8 +7,6 @@ using Microsoft.AspNetCore.Components.Forms;
 
 using Odb.Client.Lib.Model;
 
-using static Odb.Client.Lib.OdbDesignHttpClient;
-
 namespace Odb.Client.Lib.Services
 {
     public interface IOdbDesignClientService
@@ -18,7 +16,6 @@ namespace Odb.Client.Lib.Services
 
         Task<FileUploadResponse> UploadDesignFileAsync(DesignFileUploadInfo uploadFileInfo);
         Task<FileUploadResponse> UploadDesignFilesAsync(IEnumerable<DesignFileUploadInfo> uploadFileInfos);
-
         Task<FileUploadResponse> UploadDesignFilesAsync(IEnumerable<IBrowserFile> browserFiles);
     }
 }

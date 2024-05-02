@@ -38,7 +38,7 @@ namespace Odb.Client.Lib.Services
             return await _odbDesignHttpClient.FetchFileArchiveListAsync();
         }
 
-        public async Task<FileUploadResponse> UploadDesignFileAsync(OdbDesignHttpClient.DesignFileUploadInfo uploadFileInfo)
+        public async Task<FileUploadResponse> UploadDesignFileAsync(DesignFileUploadInfo uploadFileInfo)
         {
             return await _odbDesignHttpClient.UploadDesignFileAsync(uploadFileInfo);
         }
@@ -48,7 +48,7 @@ namespace Odb.Client.Lib.Services
             return await _odbDesignHttpClient.UploadDesignFilesAsync(browserFiles);
         }
 
-        public async Task<FileUploadResponse> UploadDesignFilesAsync(IEnumerable<OdbDesignHttpClient.DesignFileUploadInfo> uploadFileInfos)
+        public async Task<FileUploadResponse> UploadDesignFilesAsync(IEnumerable<DesignFileUploadInfo> uploadFileInfos)
         {
             return await _odbDesignHttpClient.UploadDesignFilesAsync(uploadFileInfos);
         }

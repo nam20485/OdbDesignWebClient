@@ -18,8 +18,8 @@ namespace Odb.Client.Lib
         Task<FileArchive> FetchFileArchiveAsync(string name);
         FileArchiveListResponse FetchFileArchiveList();
         Task<FileArchiveListResponse> FetchFileArchiveListAsync();
-        Task<FileUploadResponse> UploadDesignFileAsync(OdbDesignHttpClient.DesignFileUploadInfo uploadFileInfo);
-        Task<FileUploadResponse> UploadDesignFilesAsync(IEnumerable<OdbDesignHttpClient.DesignFileUploadInfo> uploadFileInfos);
+        Task<FileUploadResponse> UploadDesignFileAsync(DesignFileUploadInfo uploadFileInfo);
+        Task<FileUploadResponse> UploadDesignFilesAsync(IEnumerable<DesignFileUploadInfo> uploadFileInfos);
         Task<FileUploadResponse> UploadDesignFilesAsync(IEnumerable<IBrowserFile> browserFiles);
     }
 }
