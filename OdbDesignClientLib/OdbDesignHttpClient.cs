@@ -31,12 +31,6 @@ namespace Odb.Client.Lib
         //    _httpClientFactory = httpClientClientFactory;
         //}
 
-        public void AddAuthenticationData(string username, string password)
-        {
-            //var authHeaderValue = Convert.ToBase64String(Encoding.ASCII.GetBytes($"{username}:{password}"));
-            //_httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", authHeaderValue);
-        }
-
         public TResponseObject FetchObject<TResponseObject>(string endpoint) where TResponseObject : class
         {
             return FetchObjectAsync<TResponseObject>(endpoint).GetAwaiter().GetResult();
@@ -74,7 +68,7 @@ namespace Odb.Client.Lib
                         File.WriteAllText(path, await response.Content.ReadAsStringAsync());
                         Console.WriteLine("complete");
 
-                        Console.WriteLine("reading content from response... ");
+                        Console.Write("reading content from response... ");
                         stream = await response.Content.ReadAsStreamAsync();
                         Console.WriteLine("complete");
                     }
@@ -126,5 +120,50 @@ namespace Odb.Client.Lib
         }
 
         public FileArchiveListResponse FetchFileArchiveList() => FetchFileArchiveListAsync().GetAwaiter().GetResult();
+
+        public struct DesignFileUploadInfo
+        {
+            public string Filename;
+            public byte[] Bytes;
+        }
+
+        public async Task<FileUploadResponse> UploadDesignFileAsync(DesignFileUploadInfo uploadFileInfo)
+        {
+            var content = new ByteArrayContent(uploadFileInfo.Bytes);
+            content.Headers.ContentType = MediaTypeHeaderValue.Parse("application/octet-stream");            
+
+            var endpoint = $"files/upload/{uploadFileInfo.Filename}";
+
+            var response = await _httpClient.PostAsync(endpoint, content);
+            if (response.IsSuccessStatusCode)
+            {
+                var stream = await response.Content.ReadAsStreamAsync();
+                return await JsonSerializer.DeserializeAsync<FileUploadResponse>(stream, LibJsonSerializerOptions.Instance);
+            }
+
+            return null;
+        }
+
+        public async Task<FileUploadResponse> UploadDesignFilesAsync(DesignFileUploadInfo[] uploadFileInfos)
+        {
+            var content = new MultipartFormDataContent("file");
+            foreach (var fileInfo in uploadFileInfos)
+            {
+                var fileContent = new ByteArrayContent(fileInfo.Bytes);                
+                fileContent.Headers.ContentType = MediaTypeHeaderValue.Parse("application/octet-stream");                
+                content.Add(fileContent, "file", fileInfo.Filename);
+            }
+
+            var endpoint = $"files/upload";
+
+            var response = await _httpClient.PostAsync(endpoint, content);
+            if (response.IsSuccessStatusCode)
+            {
+                var stream = await response.Content.ReadAsStreamAsync();
+                return await JsonSerializer.DeserializeAsync<FileUploadResponse>(stream, LibJsonSerializerOptions.Instance);
+            }
+
+            return null;
+        }
     }
 }

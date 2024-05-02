@@ -34,5 +34,15 @@ namespace Odb.Client.Lib.Services
         {
             return await _odbDesignHttpClient.FetchFileArchiveListAsync();
         }
+
+        public async Task<FileUploadResponse> UploadDesignFileAsync(OdbDesignHttpClient.DesignFileUploadInfo uploadFileInfo)
+        {
+            return await _odbDesignHttpClient.UploadDesignFileAsync(uploadFileInfo);
+        }
+
+        public async Task<FileUploadResponse> UploadDesignFilesAsync(OdbDesignHttpClient.DesignFileUploadInfo[] uploadFileInfos)
+        {
+            return await _odbDesignHttpClient.UploadDesignFilesAsync(uploadFileInfos);
+        }
     }
 }
