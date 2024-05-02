@@ -2,6 +2,9 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
+
+using Microsoft.AspNetCore.Components.Forms;
+
 using Odb.Client.Lib.Model;
 
 using static Odb.Client.Lib.OdbDesignHttpClient;
@@ -14,6 +17,8 @@ namespace Odb.Client.Lib.Services
         Task<FileArchiveListResponse> GetFileArchiveListAsync();
 
         Task<FileUploadResponse> UploadDesignFileAsync(DesignFileUploadInfo uploadFileInfo);
-        Task<FileUploadResponse> UploadDesignFilesAsync(DesignFileUploadInfo[] uploadFileInfos);
+        Task<FileUploadResponse> UploadDesignFilesAsync(IEnumerable<DesignFileUploadInfo> uploadFileInfos);
+
+        Task<FileUploadResponse> UploadDesignFilesAsync(IEnumerable<IBrowserFile> browserFiles);
     }
 }

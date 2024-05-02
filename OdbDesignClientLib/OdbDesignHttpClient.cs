@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Net.Http;
 using System.Net.Http.Headers;
@@ -7,14 +8,24 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using System.Xml.Linq;
+
+using Microsoft.AspNetCore.Components.Forms;
+
 using Odb.Client.Lib.Model;
 using Odb.Client.Lib.Services;
 
 namespace Odb.Client.Lib
 {
-    public class OdbDesignHttpClient
+    public class OdbDesignHttpClient : IOdbDesignHttpClient
     {
         public bool UseLocalCopy { get; } = false;
+
+        private const string FILES_UPLOAD_ENDPOINT = "files/upload";
+        private const string MULTIPART_FORM_PART_NAME = "file";
+        private const string MULTIPART_FORM_BOUNDARY = "file";
+        private const string CONTENT_TYPE_APPLICATION_OCTET_STREAM = "application/octet-stream";
+        
+        private const int OPEN_READSTREAM_MAX_FILE_SIZE = 200 * Constants.Numbers.BYTES_PER_MEGABYTE;        
 
         private readonly HttpClient _httpClient;
         //private readonly IHttpClientFactory _httpClientFactory;
@@ -31,12 +42,12 @@ namespace Odb.Client.Lib
         //    _httpClientFactory = httpClientClientFactory;
         //}
 
-        public TResponseObject FetchObject<TResponseObject>(string endpoint) where TResponseObject : class
+        private TResponseObject FetchObject<TResponseObject>(string endpoint) where TResponseObject : class
         {
             return FetchObjectAsync<TResponseObject>(endpoint).GetAwaiter().GetResult();
         }
 
-        public async Task<TResponseObject> FetchObjectAsync<TResponseObject>(string endpoint) where TResponseObject : class
+        private async Task<TResponseObject> FetchObjectAsync<TResponseObject>(string endpoint) where TResponseObject : class
         {
             TResponseObject respObj = null;
 
@@ -47,7 +58,7 @@ namespace Odb.Client.Lib
             //using (var httpClient = _httpClientFactory.CreateClient())
             try
             {
-                var response = await _httpClient.GetAsync(endpoint);
+                using var response = await _httpClient.GetAsync(endpoint);
 
                 Console.WriteLine($"complete ({response.StatusCode})");
 
@@ -75,6 +86,8 @@ namespace Odb.Client.Lib
 
                     Console.Write("deserializing response content... ");
                     respObj = await JsonSerializer.DeserializeAsync<TResponseObject>(stream, LibJsonSerializerOptions.Instance);
+                    stream.Close();
+                    stream.Dispose();
                     Console.WriteLine("complete");
                 }
             }
@@ -125,45 +138,54 @@ namespace Odb.Client.Lib
         {
             public string Filename;
             public byte[] Bytes;
-        }
+        }      
 
         public async Task<FileUploadResponse> UploadDesignFileAsync(DesignFileUploadInfo uploadFileInfo)
         {
-            var content = new ByteArrayContent(uploadFileInfo.Bytes);
-            content.Headers.ContentType = MediaTypeHeaderValue.Parse("application/octet-stream");            
+            using var content = new ByteArrayContent(uploadFileInfo.Bytes);
+            content.Headers.ContentType = MediaTypeHeaderValue.Parse(CONTENT_TYPE_APPLICATION_OCTET_STREAM);            
 
-            var endpoint = $"files/upload/{uploadFileInfo.Filename}";
-
-            var response = await _httpClient.PostAsync(endpoint, content);
-            if (response.IsSuccessStatusCode)
-            {
-                var stream = await response.Content.ReadAsStreamAsync();
-                return await JsonSerializer.DeserializeAsync<FileUploadResponse>(stream, LibJsonSerializerOptions.Instance);
-            }
-
-            return null;
+            var endpoint = $"{FILES_UPLOAD_ENDPOINT}/{uploadFileInfo.Filename}";
+            return await PostContentAsync<FileUploadResponse>(content, endpoint);
         }
 
-        public async Task<FileUploadResponse> UploadDesignFilesAsync(DesignFileUploadInfo[] uploadFileInfos)
+        public async Task<FileUploadResponse> UploadDesignFilesAsync(IEnumerable<DesignFileUploadInfo> uploadFileInfos)
         {
-            var content = new MultipartFormDataContent("file");
+            using var content = new MultipartFormDataContent(MULTIPART_FORM_BOUNDARY);
             foreach (var fileInfo in uploadFileInfos)
             {
-                var fileContent = new ByteArrayContent(fileInfo.Bytes);                
-                fileContent.Headers.ContentType = MediaTypeHeaderValue.Parse("application/octet-stream");                
-                content.Add(fileContent, "file", fileInfo.Filename);
+                var fileContent = new ByteArrayContent(fileInfo.Bytes);
+                fileContent.Headers.ContentType = MediaTypeHeaderValue.Parse(CONTENT_TYPE_APPLICATION_OCTET_STREAM);
+                content.Add(fileContent, MULTIPART_FORM_PART_NAME, fileInfo.Filename);
             }
 
-            var endpoint = $"files/upload";
+            return await PostContentAsync<FileUploadResponse>(content, FILES_UPLOAD_ENDPOINT);          
+        }        
 
-            var response = await _httpClient.PostAsync(endpoint, content);
+        public async Task<FileUploadResponse> UploadDesignFilesAsync(IEnumerable<IBrowserFile> browserFiles)
+        {
+            using var content = new MultipartFormDataContent(MULTIPART_FORM_BOUNDARY);
+            foreach (var browserFile in browserFiles)
+            {
+                var fileContent = new StreamContent(browserFile.OpenReadStream(OPEN_READSTREAM_MAX_FILE_SIZE));
+                fileContent.Headers.ContentType = MediaTypeHeaderValue.Parse(CONTENT_TYPE_APPLICATION_OCTET_STREAM);
+                content.Add(fileContent, MULTIPART_FORM_PART_NAME, browserFile.Name);
+            }
+
+            return await PostContentAsync<FileUploadResponse>(content, FILES_UPLOAD_ENDPOINT);
+        }
+
+        private async Task<TReturn> PostContentAsync<TReturn>(HttpContent content, string endpoint)
+        {
+            using var response = await _httpClient.PostAsync(endpoint, content);
             if (response.IsSuccessStatusCode)
             {
-                var stream = await response.Content.ReadAsStreamAsync();
-                return await JsonSerializer.DeserializeAsync<FileUploadResponse>(stream, LibJsonSerializerOptions.Instance);
+                using var stream = await response.Content.ReadAsStreamAsync();
+                return await JsonSerializer.DeserializeAsync<TReturn>(stream, LibJsonSerializerOptions.Instance);
             }
 
-            return null;
+            return default;
         }
+
     }
 }

@@ -6,6 +6,9 @@ using System.Net.Http;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
+
+using Microsoft.AspNetCore.Components.Forms;
+
 using Odb.Client.Lib.Model;
 
 namespace Odb.Client.Lib.Services
@@ -40,7 +43,12 @@ namespace Odb.Client.Lib.Services
             return await _odbDesignHttpClient.UploadDesignFileAsync(uploadFileInfo);
         }
 
-        public async Task<FileUploadResponse> UploadDesignFilesAsync(OdbDesignHttpClient.DesignFileUploadInfo[] uploadFileInfos)
+        public async Task<FileUploadResponse> UploadDesignFilesAsync(IEnumerable<IBrowserFile> browserFiles)
+        {
+            return await _odbDesignHttpClient.UploadDesignFilesAsync(browserFiles);
+        }
+
+        public async Task<FileUploadResponse> UploadDesignFilesAsync(IEnumerable<OdbDesignHttpClient.DesignFileUploadInfo> uploadFileInfos)
         {
             return await _odbDesignHttpClient.UploadDesignFilesAsync(uploadFileInfos);
         }
