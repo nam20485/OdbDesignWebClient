@@ -6,6 +6,8 @@ namespace Utils.Logging
 {
     public interface ILogger
     {
+        LoggerBase.Level LogLevel { get; set; }
+
         void Log(LoggerBase.Level level, string message, params object[] @params);
         void Trace(string message, params object[] @params);
         void Debug(string message, params object[] @params);

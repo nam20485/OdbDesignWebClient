@@ -16,7 +16,7 @@ namespace Utils.Logging
             None
         }
 
-        public Level LogLevel { get; } = Level.Info;
+        public Level LogLevel { get; set; }
 
         public LoggerBase(Level level)
         {

@@ -6,6 +6,11 @@ namespace Utils.Logging
 {
     public class ConsoleLogger : LoggerBase
     {
+        public ConsoleLogger()
+            : this(Level.Info)
+        {
+        }
+
         public ConsoleLogger(Level level)
             : base(level)
         {
