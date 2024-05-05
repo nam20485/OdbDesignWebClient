@@ -21,6 +21,8 @@ namespace Odb.Client.Lib
         public bool UseLocalCopy { get; } = false;
 
         private const string FILES_UPLOAD_ENDPOINT = "files/upload";
+        private const string FILEMODELS_ENDPOINT = "filemodels";
+        private const string DESIGNS_ENDPOINT = "designs";
         private const string MULTIPART_FORM_PART_NAME = "file";
         private const string MULTIPART_FORM_BOUNDARY = "file";
         private const string CONTENT_TYPE_APPLICATION_OCTET_STREAM = "application/octet-stream";
@@ -101,7 +103,7 @@ namespace Odb.Client.Lib
 
         public async Task<FileArchive> FetchFileArchiveAsync(string name)
         {
-            var endpoint = $"filemodel/{name}";
+            var endpoint = $"{FILEMODELS_ENDPOINT}/{name}";
             var fileArchive = await FetchObjectAsync<FileArchive>(endpoint);
             return fileArchive;
         }
@@ -115,7 +117,7 @@ namespace Odb.Client.Lib
         {
             Console.WriteLine($"Fetching design: {name}...");
 
-            var endpoint = $"designs/{name}";
+            var endpoint = $"{DESIGNS_ENDPOINT}/{name}";
             var design = await FetchObjectAsync<Design>(endpoint);
 
             Console.WriteLine("Fetching design complete");
