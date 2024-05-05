@@ -15,41 +15,43 @@
     <button disabled="@(SelectedFiles == null || SelectedFiles.Count == 0)" id="ifpicker" class="btn btn-primary" @onclick="UploadDesignFiles">Upload</button>
 </div>
 
-<RadzenDataGrid style="height: 400px" @ref="grid" IsLoading=@isLoading AllowVirtualization="true" Count="@count" Data="@fileLoadedInfos" LoadData="@LoadData" AllowSorting="true" AllowFiltering="true" AllowPaging="false" ColumnWidth="200px">
+<RadzenDataGrid style="height: 500px" @ref="grid" IsLoading=@isLoading Count="@count" Data="@fileLoadedInfos" TItem="FileArchiveListResponse.FileLoadedInfo"
+                LoadData="@LoadData" AllowSorting="true" AllowFiltering="true" AllowPaging="false" ColumnWidth="100px"
+                FilterMode="FilterMode.Simple" FilterCaseSensitivity="@FilterCaseSensitivity.CaseInsensitive" LogicalFilterOperator="@LogicalFilterOperator.And"
+                >
      <Columns>
-        <RadzenDataGridColumn Property="Name" Filterable="false" Sortable="true" Title="Name" Frozen="true" Width="80px" TextAlign="TextAlign.Left"/>
-        <RadzenDataGridColumn Property="Loaded" Title="Loaded (Server)" Frozen="true" Sortable="false" Filterable="false" Width="80px" TextAlign="TextAlign.Center" />
-
-        @*            
-            <Template Context="data">
-                <RadzenImage Path="@data.Photo" class="rz-gravatar" AlternateText="@(data.FirstName + " " + data.LastName)" />
-            </Template>
-        *@
-        <RadzenDataGridColumn Title="Open" Sortable="false" TextAlign="TextAlign.Center" Width="100px">
+        <RadzenDataGridColumn Property="Name" Filterable="true" Sortable="true" Title="Name" Frozen="false" Width="80px" TextAlign="TextAlign.Left"/>
+        <RadzenDataGridColumn Property="Loaded" Title="Loaded (Server)" Frozen="false" Sortable="true" Filterable="true" Width="80px" TextAlign="TextAlign.Center" />       
+        <RadzenDataGridColumn Title="" Sortable="false" Filterable="false" TextAlign="TextAlign.Center" Width="80px">
             <Template Context="fileLoadedInfo">
-                <RadzenButton Text="Open" Icon="launch" ButtonStyle="ButtonStyle.Secondary" Click="@((args) => OnOpenDesignClick(fileLoadedInfo))" />
+                <RadzenButton Text="Open" Icon="launch" Size="ButtonSize.Small" ButtonStyle="ButtonStyle.Secondary" Click="@((args) => OnOpenDesignClick(fileLoadedInfo))" />
             </Template>
         </RadzenDataGridColumn>
     </Columns>
 </RadzenDataGrid>
+<div>
+    @(fileArchive != null? fileArchive.miscInfoFile.jobName : "")
+</div>
 
 
 @code {
 
-    RadzenDataGrid<FileArchiveListResponse.FileLoadedInfo> grid;
-    int count;
+    RadzenDataGrid<FileArchiveListResponse.FileLoadedInfo> grid;    
     IEnumerable<FileArchiveListResponse.FileLoadedInfo> fileLoadedInfos;
+    int count;
     bool isLoading = false;
+
+    FileArchive fileArchive = null;
 
     private IReadOnlyList<IBrowserFile> SelectedFiles { get; set; }
 
     private async Task UploadDesignFiles()
     {
         var response = await OdbDesignClientService.UploadDesignFilesAsync(SelectedFiles);
-        isLoading = true;
-        UpdateFileLoadedInfos(response.FileArchives);
-        isLoading = false;
-        StateHasChanged();
+        //isLoading = true;
+        //UpdateFileLoadedInfos(response.FileArchives);
+        //isLoading = false;
+        await grid.Reload();
     }
 
     public void OnInputFileChanged(InputFileChangeEventArgs args)
@@ -58,22 +60,63 @@
         StateHasChanged();
     }
 
-    private void UpdateFileLoadedInfos(FileArchiveListResponse.FileLoadedInfo[] infos)
-    {        
-        fileLoadedInfos = infos;
-        count = infos.Length;       
-    }
-
     private async Task OnOpenDesignClick(FileArchiveListResponse.FileLoadedInfo info)
     {
-        
+        isLoading = true;
+        fileArchive = await OdbDesignClientService.GetFileArchiveAsync(info.Name);
+        isLoading = false;
+        StateHasChanged();
     }
 
     private async Task LoadData(LoadDataArgs args)
     {
         isLoading = true;
         var response = await OdbDesignClientService.GetFileArchiveListAsync();
-        UpdateFileLoadedInfos(response.FileArchives);
+        fileLoadedInfos = response.FileArchives;
+        count = response.FileArchives.Length;
+
+        //var query = Queryable.AsQueryable(response.FileArchives);
+
+        // var filter = args.Filter;
+        // var sorts = args.Sorts;
+        // var orderBy = args.OrderBy;
+
+        // if (!string.IsNullOrWhiteSpace(args.Filter))
+        // {
+        //     query = query.Where(fileLoadInfo => fileLoadInfo.Name.Contains(args.Filter));
+
+        // }
+
+
+
+
+
+
+        // // if (!string.IsNullOrWhiteSpace(args.OrderBy))
+        // // {
+        // //     query = query.OrderBy(args);
+        // // }
+
+        // var infos = query.ToList();
+        // infos.Sort()
+
+
+        //fileLoadedInfos = query.ToArray();
+
+        //count = query.Count();
+        
+
         isLoading = false;
     }
+
+    // void OnFilter(DataGridColumnFilterEventArgs<FileArchiveListResponse.FileLoadedInfo> args)
+    // {
+    //     args.
+    //     grid.Reload();
+    // }
+
+    // void OnSort(DataGridColumnSortEventArgs<FileArchiveListResponse.FileLoadedInfo> args)
+    // {
+        
+    // }
 }
