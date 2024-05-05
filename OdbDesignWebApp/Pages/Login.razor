@@ -10,9 +10,16 @@
         Username: @User     
         <br />
         Password: @Pass
+        <button class="btn btn-primary" disabled="@(!loggedIn)" onclick="@HandleLogout">
+            @if (loading)
+            {
+                <span class="spinner-border spinner-border-sm mr-1"></span>
+            }
+            Logout
+        </button>
     </div>
     <div class="card">
-        <h4 class="card-header">Blazor WebAssembly Basic Authentication Example</h4>
+        <h4 class="card-header">OdbDesign Server API Authentication</h4>
         <div class="card-body">
             <EditForm Model="@model" OnValidSubmit="HandleValidSubmit">
                 <DataAnnotationsValidator />
@@ -26,13 +33,15 @@
                     <InputText @bind-Value="model.Password" type="password" class="form-control" />
                     <ValidationMessage For="@(() => model.Password)" />
                 </div>
-                <button class="btn btn-primary">
-                    @if (loading) {
+                <button class="btn btn-primary" disabled="@loggedIn">
+                    @if (loading)
+                    {
                         <span class="spinner-border spinner-border-sm mr-1"></span>
                     }
                     Login
                 </button>
-                @if (!string.IsNullOrEmpty(error)) {
+                @if (!string.IsNullOrEmpty(error))
+                {
                     <div class="alert alert-danger mt-3 mb-0">@error</div>
                 }
             </EditForm>
@@ -48,19 +57,38 @@
     private bool loading;
     private string error;
 
+    private bool loggedIn = false;
+
     private string User { get; set; }
     private string Pass { get; set;  }
 
     protected async override Task OnInitializedAsync()
     {
-        User = await AuthenticationService.GetUsernameAsync();
-        Pass = await AuthenticationService.GetPasswordAsync();
+        await SetUserAndPass();
 
         // redirect to home if already logged in
-        if (await AuthenticationService.IsLoggedInAsync())
-        {
-            NavigationManager.NavigateTo("");
-        }
+        // if (await AuthenticationService.IsLoggedInAsync())
+        // {
+        //     NavigationManager.NavigateTo("");
+        // }
+
+        loggedIn = await AuthenticationService.IsLoggedInAsync();
+    }
+
+    async void HandleLogout()
+    {
+        loading = true;
+        await AuthenticationService.LogoutAsync();
+        await SetUserAndPass();
+        loading = false;
+        StateHasChanged();
+    }
+
+    async Task SetUserAndPass()
+    {
+        User = await AuthenticationService.GetUsernameAsync();
+        Pass = await AuthenticationService.GetPasswordAsync();
+        loggedIn = await AuthenticationService.IsLoggedInAsync();
     }
 
     private async void HandleValidSubmit()
@@ -69,18 +97,18 @@
         try
         {
             await AuthenticationService.LoginAsync(model.Username, model.Password);
-            var queryParams = HttpUtility.ParseQueryString(NavigationManager.ToAbsoluteUri(NavigationManager.Uri).Query);
-            var returnUrl = queryParams[RETURN_URL_QUERY_NAME] ?? "";
-            if (!string.IsNullOrWhiteSpace(returnUrl))
-            {
-                NavigationManager.NavigateTo(returnUrl);
-            }                      
+            await SetUserAndPass();            
+            // var queryParams = HttpUtility.ParseQueryString(NavigationManager.ToAbsoluteUri(NavigationManager.Uri).Query);
+            // var returnUrl = queryParams[RETURN_URL_QUERY_NAME] ?? "";
+            // if (!string.IsNullOrWhiteSpace(returnUrl))
+            // {
+            //     NavigationManager.NavigateTo(returnUrl);
+            // }                      
         }
         catch (Exception ex)
         {
-            error = ex.Message;            
-            
-        }    
+            error = ex.Message;                        
+        }     
         
         loading = false;
         StateHasChanged();
