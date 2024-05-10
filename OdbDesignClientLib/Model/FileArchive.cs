@@ -36,6 +36,7 @@ namespace Odb.Client.Lib.Model
 
     public class FileArchive
     {
+        public string productName { get; set; }
         public StepDirectory.StringDictionary stepsByName { get; set; }
         public MiscInfoFile miscInfoFile { get; set; }
         public Matrixfile matrixFile { get; set; }
