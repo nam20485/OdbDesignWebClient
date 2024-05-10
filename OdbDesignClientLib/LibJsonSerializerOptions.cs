@@ -8,7 +8,7 @@ namespace Odb.Client.Lib
 {
     public class LibJsonSerializerOptions
     {
-        public static readonly JsonSerializerOptions Instance = new JsonSerializerOptions()
+        private static readonly JsonSerializerOptions _instance = new ()
         {
             AllowTrailingCommas = true,
             NumberHandling = JsonNumberHandling.AllowReadingFromString,
@@ -17,7 +17,10 @@ namespace Odb.Client.Lib
             Converters =
             {
                 new JsonStringEnumConverter(JsonNamingPolicy.CamelCase, allowIntegerValues: true)
-            }
+            },
+            ReferenceHandler = ReferenceHandler.Preserve,            
         };
+
+        public static JsonSerializerOptions Instance => _instance;
     }
 }
