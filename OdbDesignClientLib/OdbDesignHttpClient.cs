@@ -25,7 +25,7 @@ namespace Odb.Client.Lib
         private const string DESIGNS_ENDPOINT = "designs";
         private const string MULTIPART_FORM_PART_NAME = "file";
         private const string MULTIPART_FORM_BOUNDARY = "file";
-        private const string CONTENT_TYPE_APPLICATION_OCTET_STREAM = "application/octet-stream";
+        //private const string CONTENT_TYPE_APPLICATION_OCTET_STREAM = "application/octet-stream";
         
         private const int OPEN_READSTREAM_MAX_FILE_SIZE = 200 * Constants.Numbers.BYTES_PER_MEGABYTE;        
 
