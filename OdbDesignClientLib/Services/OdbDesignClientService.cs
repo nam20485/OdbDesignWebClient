@@ -28,6 +28,11 @@ namespace Odb.Client.Lib.Services
             _odbDesignHttpClient = odbDesignHttpClient;
         }
 
+        public async Task<Design> GetDesignAsync(string name)
+        {
+            return await _odbDesignHttpClient.FetchDesignAsync(name);
+        }
+
         public async Task<FileArchive> GetFileArchiveAsync(string name)
         {
             return await _odbDesignHttpClient.FetchFileArchiveAsync(name);
