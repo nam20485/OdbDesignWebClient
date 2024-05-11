@@ -13,6 +13,8 @@ namespace Odb.Client.Lib.Services
     {
         Task<FileArchive> GetFileArchiveAsync(string name);
         Task<FileArchiveListResponse> GetFileArchiveListAsync();
+        
+        Task<Design> GetDesignAsync(string name);
 
         Task<FileArchiveListResponse> UploadDesignFileAsync(DesignFileUploadInfo uploadFileInfo);
         Task<FileArchiveListResponse> UploadDesignFilesAsync(IEnumerable<DesignFileUploadInfo> uploadFileInfos);
