@@ -5,15 +5,15 @@ using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
 
+using Utils;
+
 namespace Odb.Client.Lib.Services
 {
-    public class AuthenticationService : IAuthenticationService
+    public class LocalStorageAuthService : IAuthenticationService
     {            
-        public string Username { get; }
-
         private readonly ILocalStorageService _localStorageService;
 
-        public AuthenticationService(ILocalStorageService localStorageService)
+        public LocalStorageAuthService(ILocalStorageService localStorageService)
         {
             _localStorageService = localStorageService;
         }
@@ -22,16 +22,9 @@ namespace Odb.Client.Lib.Services
         {
             var username = await GetUsernameAsync();
             var password = await GetPasswordAsync();
-
-            if (!string.IsNullOrWhiteSpace(username) && !string.IsNullOrWhiteSpace(password))
-            {
-                var authHeaderValue = Convert.ToBase64String(Encoding.ASCII.GetBytes($"{username}:{password}"));
-                return new AuthenticationHeaderValue("Basic", authHeaderValue);
-            }
-
-            return null;
+            return AuthUtils.MakeAuthHeaderValue(username, password);
         }
-
+      
         public async Task<bool> IsLoggedInAsync()
         {
             return await GetAuthenticationHeaderValueAsync() != null;
@@ -56,6 +49,39 @@ namespace Odb.Client.Lib.Services
         public async Task<string> GetPasswordAsync()
         {
             return await _localStorageService.GetPasswordAsync();
+        }
+
+        public bool IsLoggedIn()
+        {
+            return GetAuthenticationHeaderValue() != null;
+        }
+
+        public void Login(string username, string pass)
+        {
+            _localStorageService.SetUsername(username);
+            _localStorageService.SetPassword(pass);
+        }
+
+        public void Logout()
+        {
+            _localStorageService.RemoveAuthData();
+        }
+
+        public AuthenticationHeaderValue GetAuthenticationHeaderValue()
+        {
+            var username = GetUsername();
+            var password = GetPassword();
+            return AuthUtils.MakeAuthHeaderValue(username, password);
+        }
+
+        public string GetUsername()
+        {
+            return _localStorageService.GetUsername();
+        }
+
+        public string GetPassword()
+        {
+            return _localStorageService.GetPassword();
         }
     }
 }
