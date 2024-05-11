@@ -34,7 +34,7 @@ namespace OdbDesignWebApp
             builder.Services.AddSingleton<IJsInteropProvider, JsInteropProvider>();
             builder.Services.AddSingleton<ILocalStorageProvider, JsLocalStorageProvider>();
             builder.Services.AddSingleton<ILocalStorageService, LocalStorageService>();   
-            builder.Services.AddSingleton<IAuthenticationService, AuthenticationService>();                     
+            builder.Services.AddSingleton<IAuthenticationService, LocalStorageAuthService>();                     
             builder.Services.AddSingleton<IOdbDesignClientService, OdbDesignClientService>();            
 
             await builder.Build().RunAsync();
