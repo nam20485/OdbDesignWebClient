@@ -29,11 +29,6 @@ namespace Odb.Client.Lib.Model
         Imperial
     };
 
-    public class Design
-    {
-
-    }
-
     public class FileArchive
     {
         public string productName { get; set; }
