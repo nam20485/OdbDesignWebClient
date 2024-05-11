@@ -11,14 +11,15 @@ namespace Odb.Client.Lib
         private static readonly JsonSerializerOptions _instance = new ()
         {
             AllowTrailingCommas = true,
-            NumberHandling = JsonNumberHandling.AllowReadingFromString,
+            //NumberHandling = JsonNumberHandling.AllowReadingFromString,
             PropertyNameCaseInsensitive = true,
             PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-            Converters =
-            {
-                new JsonStringEnumConverter(JsonNamingPolicy.CamelCase, allowIntegerValues: true)
-            },
-            ReferenceHandler = ReferenceHandler.Preserve,            
+            //Converters =
+            //{
+            //    new JsonStringEnumConverter(JsonNamingPolicy.CamelCase, allowIntegerValues: true)
+            //},
+            //ReferenceHandler = ReferenceHandler.Preserve,  
+            TypeInfoResolver = SourceGenerationContext.Default
         };
 
         public static JsonSerializerOptions Instance => _instance;
