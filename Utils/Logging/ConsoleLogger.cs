@@ -16,9 +16,9 @@ namespace Utils.Logging
         {
         }
 
-        protected override void LogMessage(string message, params object[] @params)
+        protected override void WriteMessage(string message)
         {
-            Console.Out.WriteLine(message, @params);            
+            Console.Out.WriteLine(message);            
         }
     }    
 }
