@@ -12,5 +12,11 @@ namespace Odb.Client.Lib.Services
         Task SetPasswordAsync(string password);
         Task SetUsernameAsync(string username);
         Task RemoveAuthDataAsync();
+
+        string GetUsername();
+        string GetPassword();
+        void SetPassword(string password);
+        void SetUsername(string username);
+        void RemoveAuthData();
     }
 }

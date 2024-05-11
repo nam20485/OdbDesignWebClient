@@ -15,5 +15,13 @@ namespace Odb.Client.Lib.Services
 
         Task<string> GetUsernameAsync();
         Task<string> GetPasswordAsync();
+
+        bool IsLoggedIn();
+        void Login(string username, string pass);
+        void Logout();
+        AuthenticationHeaderValue GetAuthenticationHeaderValue();
+
+        string GetUsername();
+        string GetPassword();
     }
 }
