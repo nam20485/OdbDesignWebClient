@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "OdbDesignConsoleClient": {
+      "commandName": "Project",
+      "commandLineArgs": "http://localhost:8888 sample_design"
+    }
+  }
+}
