@@ -1,6 +1,9 @@
 ﻿using Odb.Client.Lib;
 using Odb.Client.Lib.Services;
 
+using Utils;
+using Utils.Logging;
+
 namespace OdbDesignConsoleClient
 {
     internal class Program
@@ -13,39 +16,73 @@ namespace OdbDesignConsoleClient
 
         public static int Main(string[] args)
         {
-            Console.Write("OdbDesign Client");
+            ExitCode exitCode = ExitCode.UnknownError;
 
-            if (args.Length > 1)
+            try
             {
-                if (!string.IsNullOrWhiteSpace(args[0]) &&
-                    !string.IsNullOrWhiteSpace(args[1]))
+
+                Logger.Start(LoggerBase.Level.Info);
+
+                Logger.Info("OdbDesign Client");
+
+                if (args.Length > 1)
                 {
-                    var apiUri = new Uri(args[0]);
-                    var designName = args[1];
-
-                    using var httpClient = new HttpClient()
+                    if (!string.IsNullOrWhiteSpace(args[0]) &&
+                        !string.IsNullOrWhiteSpace(args[1]))
                     {
-                        BaseAddress = apiUri,
-                        Timeout = TimeSpan.FromSeconds(_requestTimeoutInMinutes * SECONDS_PER_MINUTE)
-                    };
+                        var apiUri = new Uri(args[0]);
+                        var designName = args[1];
 
-                    Console.WriteLine($" - [Server: '{httpClient.BaseAddress}' (Timeout: {httpClient.Timeout})]");
-                    Console.WriteLine();
+                        using var handler = new HttpClientHandler()
+                        {
+                            ServerCertificateCustomValidationCallback = HttpClientHandler.DangerousAcceptAnyServerCertificateValidator
+                        };
 
-                    var odbDesignClient = new OdbDesignHttpClient(httpClient, _authService);
-                    
-                    //var fileArchive = odbDesignClient.FetchFileArchive(designName);                
-                    var design = odbDesignClient.FetchDesign(designName);
+                        using var httpClient = new HttpClient(handler)
+                        {
+                            BaseAddress = apiUri,
+                            Timeout = TimeSpan.FromSeconds(_requestTimeoutInMinutes * SECONDS_PER_MINUTE)
+                        };
 
-                    return 0;
+                        Logger.Info($"Server: '{httpClient.BaseAddress}' (Timeout: {httpClient.Timeout})");
+
+                        var odbDesignClient = new OdbDesignHttpClient(httpClient, _authService);
+
+                        var fileArchiveList = odbDesignClient.FetchFileArchiveList();
+                        foreach (var fileArchive in fileArchiveList.FileArchives)
+                        {
+                            Logger.Info($"FileArchive: \"{fileArchive.Name},\" loaded={fileArchive.Loaded}");
+                        }
+
+                        //var fileArchive = odbDesignClient.FetchFileArchive(designName);                
+                        var design = odbDesignClient.FetchDesign(designName);
+
+                        exitCode = ExitCode.Success;
+                    }
+                    else
+                    {
+                        exitCode = ExitCode.InvalidArguments;
+                    }
                 }
+                else
+                {
+                    exitCode = ExitCode.InvalidArguments;
+                }              
+            }
+            catch (Exception e)
+            {
+                Logger.Exception(e);
             }
 
-            PrintUsage();
-            return 1;
-        }
+            Logger.Stop();
 
-       
+            if (exitCode == ExitCode.InvalidArguments)
+            {
+                PrintUsage();
+            }
+
+            return (int) exitCode;
+        }       
 
         private static void PrintUsage()
         {
