@@ -9,10 +9,20 @@ namespace Utils.Logging
     {
         private static readonly ILogger _logger = new ConsoleLogger();
 
-        public static LoggerBase.Level Level
+        //public static LoggerBase.Level Level
+        //{
+        //    get => _logger.LogLevel;
+        //    set => _logger.LogLevel = value;
+        //}
+
+        public static void Start(LoggerBase.Level level)
         {
-            get => _logger.LogLevel;
-            set => _logger.LogLevel = value;
+            _logger.Start(level);
+        }
+
+        public static void Stop()
+        {
+            _logger.Stop();
         }
 
         public static void Trace(string message, params object[] @params)
@@ -38,6 +48,11 @@ namespace Utils.Logging
         public static void Error(string message, params object[] @params)
         {
             _logger.Error(message, @params);
+        }
+
+        public static void Exception(Exception e)
+        {
+            _logger.Exception(e);
         }
     }
 }

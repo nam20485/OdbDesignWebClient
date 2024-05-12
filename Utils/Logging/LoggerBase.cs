@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Text;
 
+using static Utils.Logging.LoggerBase;
+
 namespace Utils.Logging
 {
     public abstract class LoggerBase : ILogger
@@ -16,13 +18,15 @@ namespace Utils.Logging
             None
         }
 
-        private const string MessageFormat = "[{0:yyyy-MM-dd HH:mm:ss.fff} - [{1}] {2}";
+        private const Level DefaultLogLevel = Level.Info;
 
-        public Level LogLevel { get; set; }
+        private const string MessageFormat = "[{0:yyyy-MM-dd HH:mm:ss.fff} - {1}] {2}";
 
-        public LoggerBase(Level level)
+        public Level LogLevel { get; private set; }
+
+        public LoggerBase()
         {
-            LogLevel = level;
+            LogLevel = DefaultLogLevel;
         }
 
         protected abstract void WriteMessage(string message);
@@ -65,6 +69,22 @@ namespace Utils.Logging
         public void Warn(string message, params object[] @params)
         {
             Log(Level.Warn, message, @params);
+        }      
+
+        public void Stop()
+        {
+            Info("Logger stopping");
+        }
+
+        public void Start(Level level)
+        {
+            LogLevel = level;
+            Info("Logger started with level {0}", level.ToString());
+        }
+
+        public void Exception(Exception e)
+        {
+            Error(e.ToString());
         }
     }
 }

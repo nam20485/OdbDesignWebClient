@@ -6,15 +6,15 @@ namespace Utils.Logging
 {
     public class ConsoleLogger : LoggerBase
     {
-        public ConsoleLogger()
-            : this(Level.Info)
-        {
-        }
+        //public ConsoleLogger()
+        //    : this(Level.Info)
+        //{
+        //}
 
-        public ConsoleLogger(Level level)
-            : base(level)
-        {
-        }
+        //public ConsoleLogger(Level level)
+        //    : base(level)
+        //{
+        //}
 
         protected override void WriteMessage(string message)
         {
