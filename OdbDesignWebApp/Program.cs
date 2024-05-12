@@ -6,6 +6,7 @@ using Odb.Client.Lib;
 using Odb.Client.Lib.Services;
 
 using Utils.Interop;
+using Utils.Logging;
 
 namespace OdbDesignWebApp
 {
@@ -15,6 +16,8 @@ namespace OdbDesignWebApp
 
         public static async Task Main(string[] args)
         {
+            Logger.Start(LoggerBase.Level.Info);
+
             var builder = WebAssemblyHostBuilder.CreateDefault(args);
             builder.RootComponents.Add<App>("#app");
             builder.RootComponents.Add<HeadOutlet>("head::after");
@@ -38,6 +41,8 @@ namespace OdbDesignWebApp
             builder.Services.AddSingleton<IOdbDesignClientService, OdbDesignClientService>();            
 
             await builder.Build().RunAsync();
+
+            Logger.Stop();
         }
     }
 }
