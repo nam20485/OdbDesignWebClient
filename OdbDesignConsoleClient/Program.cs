@@ -1,4 +1,5 @@
 ﻿using Odb.Client.Lib;
+using Odb.Client.Lib.Model;
 using Odb.Client.Lib.Services;
 
 using Utils;
@@ -12,7 +13,13 @@ namespace OdbDesignConsoleClient
 
         private static readonly IAuthenticationService _authService = new EnvironmentAuthService();
 
-        private const int SECONDS_PER_MINUTE = 60;       
+        private const int SECONDS_PER_MINUTE = 60;
+
+        //private const string ApiUrl = "http://localhost:8888/";
+        private const string ApiUrl = "https://precision5820:8443/";
+        private const string FetchDesignName = "Turbot";
+
+        private const bool DisableCertValidation = true;
 
         public static int Main(string[] args)
         {
@@ -30,12 +37,14 @@ namespace OdbDesignConsoleClient
                     if (!string.IsNullOrWhiteSpace(args[0]) &&
                         !string.IsNullOrWhiteSpace(args[1]))
                     {
-                        var apiUri = new Uri(args[0]);
-                        var designName = args[1];
+                        //var apiUri = new Uri(args[0]);
+                        var apiUri = new Uri(ApiUrl);
+                        //var designName = args[1];
+                        var designName = FetchDesignName;                        
 
                         using var handler = new HttpClientHandler()
                         {
-                            ServerCertificateCustomValidationCallback = HttpClientHandler.DangerousAcceptAnyServerCertificateValidator
+                            ServerCertificateCustomValidationCallback = DisableCertValidation? HttpClientHandler.DangerousAcceptAnyServerCertificateValidator : null
                         };
 
                         using var httpClient = new HttpClient(handler)
@@ -48,14 +57,16 @@ namespace OdbDesignConsoleClient
 
                         var odbDesignClient = new OdbDesignHttpClient(httpClient, _authService);
 
-                        var fileArchiveList = odbDesignClient.FetchFileArchiveList();
-                        foreach (var fileArchive in fileArchiveList.FileArchives)
+                        if (odbDesignClient.FetchFileArchiveList() is FileArchiveListResponse fileArchiveList)
                         {
-                            Logger.Info($"FileArchive: \"{fileArchive.Name},\" loaded={fileArchive.Loaded}");
-                        }
+                            foreach (var fileArchive in fileArchiveList.FileArchives)
+                            {
+                                Logger.Info($"FileArchive: \"{fileArchive.Name}\", loaded = {fileArchive.Loaded}");
+                            }
 
-                        //var fileArchive = odbDesignClient.FetchFileArchive(designName);                
-                        var design = odbDesignClient.FetchDesign(designName);
+                            //var fileArchive = odbDesignClient.FetchFileArchive(designName);                
+                            var design = odbDesignClient.FetchDesign(designName);
+                        }
 
                         exitCode = ExitCode.Success;
                     }
