@@ -14,6 +14,8 @@ using Microsoft.AspNetCore.Components.Forms;
 using Odb.Client.Lib.Model;
 using Odb.Client.Lib.Services;
 
+using Utils.Logging;
+
 namespace Odb.Client.Lib
 {
     public class OdbDesignHttpClient : IOdbDesignHttpClient
@@ -53,16 +55,16 @@ namespace Odb.Client.Lib
         {
             TResponseObject respObj = null;
 
-            Console.Write($"making request: '{endpoint}'... ");
+            Logger.Info($"making request: '{endpoint}'... ");
 
             _httpClient.DefaultRequestHeaders.Authorization = await _authService.GetAuthenticationHeaderValueAsync();
 
             //using (var httpClient = _httpClientFactory.CreateClient())
-            try
-            {
-                using var response = await _httpClient.GetAsync(endpoint);
+            //try
+            //{
+                using var response = await _httpClient.GetAsync(endpoint);            
 
-                Console.WriteLine($"complete ({response.StatusCode})");
+                Logger.Info($"complete (\"{response.ReasonPhrase}\": {response.StatusCode} {(int) response.StatusCode})");
 
                 if (response.IsSuccessStatusCode)
                 {
@@ -77,26 +79,27 @@ namespace Odb.Client.Lib
                     }
                     else
                     {
-                        Console.Write("writing response content to file... ");
+                        Logger.Info("writing response content to file... ");
                         File.WriteAllText(path, await response.Content.ReadAsStringAsync());
-                        Console.WriteLine("complete");
+                        Logger.Info("writing content complete");
 
-                        Console.Write("reading content from response... ");
+                        Logger.Info("reading content from response... ");
                         stream = await response.Content.ReadAsStreamAsync();
-                        Console.WriteLine("complete");
+                        Logger.Info("reading content complete");
                     }
 
-                    Console.Write("deserializing response content... ");
+                    Logger.Info("deserializing response content... ");
                     respObj = await JsonSerializer.DeserializeAsync<TResponseObject>(stream, LibJsonSerializerOptions.Instance);
+                    Logger.Info("deserialization complete");
+
                     stream.Close();
-                    stream.Dispose();
-                    Console.WriteLine("complete");
+                    stream.Dispose();                    
                 }
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e);
-            }
+            //}
+            //catch (Exception e)
+            //{
+            //    Logger.Exception(e);
+            //}
 
             return respObj;
         }
@@ -115,12 +118,12 @@ namespace Odb.Client.Lib
 
         public async Task<Design> FetchDesignAsync(string name)
         {
-            Console.WriteLine($"Fetching design: {name}...");
+            Logger.Info($"Fetching design: {name}...");
 
             var endpoint = $"{DESIGNS_ENDPOINT}/{name}";
             var design = await FetchObjectAsync<Design>(endpoint);
 
-            Console.WriteLine("Fetching design complete");
+            Logger.Info("Fetching design complete");
 
             return design;
         }
