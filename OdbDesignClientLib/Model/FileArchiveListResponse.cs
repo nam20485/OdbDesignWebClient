@@ -14,6 +14,7 @@ namespace Odb.Client.Lib.Model
         {
             public string Name { get; set; }
             public bool Loaded { get; set; }
+            public string Type { get; set; }
         }
     }
 }
