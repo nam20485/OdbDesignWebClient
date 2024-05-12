@@ -2,7 +2,7 @@
   "profiles": {
     "OdbDesignConsoleClient": {
       "commandName": "Project",
-      "commandLineArgs": "http://localhost:8888 sample_design"
+      "commandLineArgs": "https://precision5820:8443 Turbot"
     }
   }
 }
